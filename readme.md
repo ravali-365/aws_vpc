@@ -1,114 +1,108 @@
 # Terraform AWS VPC Configuration
-This repository contains detailed Terraform code to provision a Virtual Private Cloud (VPC) in AWS, along with public and private subnets, an EC2 instance, and necessary security configurations. The infrastructure is deployed in the **`eu-north-1`** (Stockholm) region.
+
+This repository contains comprehensive Terraform code to provision a Virtual Private Cloud (VPC) in AWS, including public and private subnets, an EC2 instance, security groups, and routing configurations. The infrastructure is deployed in the **`eu-north-1`** (Stockholm) region and follows best practices for security and modularity.
 
 ---
 
 ## 📋 Table of Contents
-1. [Architecture Overview](#architecture-overview)  
-2. [Key Components](#key-components)  
-3. [Pre-requisites](#pre-requisites)  
-4. [Terraform Files Description](#terraform-files-description)  
-5. [How to Run This Code](#how-to-run-this-code)  
-6. [Security Fixes Applied](#security-fixes-applied)  
-7. [Outputs](#outputs)  
-8. [Clean-Up](#clean-up)  
+1. [Introduction](#introduction)  
+2. [Architecture Overview](#architecture-overview)  
+3. [Detailed Explanation of Terraform Files](#detailed-explanation-of-terraform-files)  
+4. [Step-by-Step Execution](#step-by-step-execution)  
+5. [Security Best Practices](#security-best-practices)  
+6. [Troubleshooting Common Issues](#troubleshooting-common-issues)  
+7. [Clean-Up Instructions](#clean-up-instructions)  
+
+
+---
+
+## 🛠️ Introduction
+This project demonstrates the use of Terraform to manage AWS resources using Infrastructure as Code (IaC). It covers the creation of a VPC with both public and private subnets across multiple availability zones, an EC2 instance, and necessary security configurations. The goal is to provide a scalable and secure network architecture.
 
 ---
 
 ## 🏗️ Architecture Overview
-- **VPC CIDR:** `10.0.0.0/16`  
+- **VPC CIDR:** `10.0.0.0/16`
 - **Subnets:**
-  - **3 Public Subnets:** For resources needing internet access.
-  - **3 Private Subnets:** For internal resources without internet access.
-- **Internet Gateway:** For outbound traffic from public subnets.
-- **Security Groups:** Allows HTTP traffic on port 80.
-- **EC2 Instance:** Deployed in a public subnet with a Free Tier eligible AMI.
+  - 3 Public Subnets for resources requiring internet access.
+  - 3 Private Subnets for internal resources without direct internet access.
+- **Security Groups:**
+  - Allows HTTP traffic on port 80.
+  - Allows SSH traffic on port 22.
+- **EC2 Instance:**
+  - Instance Type: `t3.micro` (Free Tier eligible)
+  - AMI: Amazon Linux 2 or a compatible AMI.
+- **Internet Gateway and Route Tables:**
+  - Manage traffic between public subnets and the internet.
 
 ---
 
-## ⚙️ Why Each Part of the Code Exists
-
+## 📂 Detailed Explanation of Terraform Files
 ### 1. `provider.tf`
+Defines the AWS provider and region.
 ```hcl
 provider "aws" {
-  region     = var.aws_region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  region = var.aws_region
 }
 ```
-- **Purpose:** Specifies AWS provider and region.
-- **Why:** Required for Terraform to communicate with AWS API.
-- **How:** Uses access and secret keys stored securely.
+- **Why:** Required to authenticate and communicate with AWS.
 
----
-
-### 2. `versions.tf`
-```hcl
-terraform {
-  required_version = ">= 1.0.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-  }
-}
-```
-- **Purpose:** Locks Terraform and AWS provider versions.
-- **Why:** Ensures compatibility and avoids breaking changes.
-- **How:** Specifies version requirements to prevent conflicts.
-
----
+### 2. `main.tf`
+Contains resources for VPC, subnets, security groups, and EC2 instance.
+- **Why:** Organizes all core resources in a single file for clarity.
 
 ### 3. `variables.tf`
-```hcl
-variable "aws_region" {
-  default = "eu-north-1"
-}
-variable "vpc_cidr" {
-  default = "10.0.0.0/16"
-}
-```
-- **Purpose:** Centralizes configuration.
-- **Why:** Enhances reusability and manageability.
-- **How:** Uses variables for VPC CIDR, subnets, and instance types.
+Defines variables for reusability and modularity.
+- **Why:** Simplifies changes and enhances code reusability.
+
+### 4. `terraform.tfvars`
+Provides actual values for variables.
+- **Why:** Separates configuration from variable declarations.
 
 ---
 
-### 4. `main.tf`
-```hcl
-resource "aws_vpc" "my_vpc" {
-  cidr_block = var.vpc_cidr
-}
+## ⚙️ Step-by-Step Execution
+1. **Initialize Terraform:**
+```bash
+terraform init
 ```
-- **Purpose:** Core resource definitions.
-- **Why:** Defines VPC, subnets, and EC2 instance setup.
-- **How:** Leverages variables for flexible deployment.
+- **What it does:** Downloads provider plugins and sets up the workspace.
+
+2. **Plan Infrastructure:**
+```bash
+terraform plan
+```
+- **Purpose:** Shows a preview of changes.
+
+3. **Apply Configuration:**
+```bash
+terraform apply
+```
+- **Purpose:** Deploys resources to AWS.
+
+4. **Verify Resources:** Check AWS console for deployed VPC and EC2.
 
 ---
 
-### 5. `terraform.tfvars`
-```hcl
-aws_region    = "eu-north-1"
-aws_access_key = "YOUR_ACCESS_KEY"
-aws_secret_key = "YOUR_SECRET_KEY"
-```
-- **Purpose:** Provides actual values for variables.
-- **Why:** Separates sensitive data from main code.
-- **How:** Stores access keys and region.
+## 🔒 Security Best Practices
+- **Environment Variables:** Use for AWS keys to avoid hardcoding.
+- **.gitignore:** Excludes `.terraform` and sensitive files.
 
 ---
 
-### 6. `outputs.tf`
-```hcl
-output "vpc_id" {
-  value = aws_vpc.my_vpc.id
-}
-```
-- **Purpose:** Displays key information after deployment.
-- **Why:** Simplifies resource verification.
-- **How:** Uses output blocks for VPC ID and public IP.
+## 🛠️ Troubleshooting Common Issues
+1. **Invalid AMI ID:** Ensure the AMI exists in the selected region.
+2. **Invalid Instance Type:** Use `t3.micro` for Free Tier eligibility.
+3. **Security Group Errors:** Define security groups explicitly.
 
 ---
 
+## 🗑️ Clean-Up Instructions
+To avoid unnecessary charges, run:
+```bash
+terraform destroy
+```
+- **Type `yes`** to confirm.
+
+---
 
