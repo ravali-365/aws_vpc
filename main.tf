@@ -53,3 +53,18 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_instance" "web_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.public_subnet[0].id
+  security_groups = [aws_security_group.web_sg.name]
+}
+
+
+resource "aws_instance" "web_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.public_subnet[0].id
+  security_groups = [aws_security_group.web_sg.name]
+}
