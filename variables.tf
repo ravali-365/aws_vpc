@@ -17,7 +17,7 @@ variable "private_subnets_cidr" {
 
 variable "instance_type" {
   description = "EC2 instance type"
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "aws_region" {
