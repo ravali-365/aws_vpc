@@ -37,11 +37,20 @@ resource "aws_route_table_association" "public_assoc" {
 }
 
 resource "aws_security_group" "web_sg" {
-  vpc_id = aws_vpc.my_vpc.id
+  name        = "web-server-sg"
+  description = "Allow HTTP and SSH traffic"
+  vpc_id      = aws_vpc.my_vpc.id
 
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -55,9 +64,10 @@ resource "aws_security_group" "web_sg" {
 }
 
 resource "aws_instance" "web_server" {
-  ami           = "ami-0018ca07c0a32d2cd" 
-  instance_type = var.instance_type
-  subnet_id     = aws_subnet.public_subnet[0].id
-  security_groups = [aws_security_group.web_sg.name]
+  ami                         = "ami-0018ca07c0a32d2cd"  
+  instance_type               = "t2.micro"
+  vpc_security_group_ids      = [aws_security_group.web_sg.id]  
+  subnet_id                   = aws_subnet.public_subnet[0].id 
+  associate_public_ip_address = true  
 }
 
