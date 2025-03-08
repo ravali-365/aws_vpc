@@ -15,3 +15,12 @@ variable "private_subnets_cidr" {
   default     = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
 }
 
+variable "instance_type" {
+  description = "EC2 instance type"
+  default     = "t2.micro"
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  default     = "eu-north-1"
+}
