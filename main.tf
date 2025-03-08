@@ -65,7 +65,7 @@ resource "aws_security_group" "web_sg" {
 
 resource "aws_instance" "web_server" {
   ami                         = "ami-0018ca07c0a32d2cd"  
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   vpc_security_group_ids      = [aws_security_group.web_sg.id]  
   subnet_id                   = aws_subnet.public_subnet[0].id 
   associate_public_ip_address = true  
